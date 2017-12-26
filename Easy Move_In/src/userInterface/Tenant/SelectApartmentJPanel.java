@@ -1,0 +1,591 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package userInterface.Tenant;
+
+import business.EcoSystem;
+import business.Tenant.Address;
+import business.Tenant.Area;
+import business.Tenant.Building;
+import business.Tenant.Flat;
+import business.Tenant.Street;
+import business.account.Account;
+import business.account.TenantAccount;
+import business.enterprise.Enterprise;
+import business.event.Event;
+import business.network.Network;
+import business.organization.FacilitiesOrganization;
+import business.organization.Organization;
+import business.project.Project;
+import business.work.FacilitiesWorkRequest;
+import java.awt.CardLayout;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.JPanel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JOptionPane;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.BinaryBitmap;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatReader;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.NotFoundException;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.common.HybridBinarizer;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import javax.imageio.ImageIO;
+import com.google.zxing.Result;
+import java.awt.event.KeyEvent;
+
+/**
+ *
+ * @author Shruti
+ */
+public class SelectApartmentJPanel extends javax.swing.JPanel {
+
+    /**
+     * Creates new form SelectApartmentJPanel
+     */
+    private JPanel userProcessContainer;
+    private EcoSystem ecosystem;
+    private Map<String, List<Area>> searchResults;
+    private TenantAccount account;
+    private Event event;
+
+    SelectApartmentJPanel(JPanel userProcessContainer, Event event, EcoSystem ecosystem, TenantAccount account) {
+        initComponents();
+        searchResults = new HashMap<>();
+        this.userProcessContainer = userProcessContainer;
+        this.ecosystem = ecosystem;
+        this.account = account;
+        this.event = event;
+    }
+
+    public void generateQRCode(String qrCodeData, String filePath, String charset, Map hintMap, int qrCodeWidth, int qrCodeHeight)// throws UnsupportedEncodingException, WriterException, IOException
+    {
+        try {
+            BitMatrix matrix = new MultiFormatWriter().encode(new String(qrCodeData.getBytes(charset), charset),
+                    BarcodeFormat.QR_CODE, qrCodeWidth, qrCodeHeight, hintMap);
+            MatrixToImageWriter.writeToFile(matrix, filePath.substring(filePath
+                    .lastIndexOf('.') + 1), new File(filePath));
+            JOptionPane.showMessageDialog(null, "QR Code created successfully.", "Information", JOptionPane.INFORMATION_MESSAGE);
+        } catch (UnsupportedEncodingException ex) {
+            ex.printStackTrace();
+        } catch (WriterException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public String readQRCode(String filePath, String charset, Map hintMap) {
+        BinaryBitmap binaryBitmap;
+        Result qrCodeResult = null;
+
+        try {
+            binaryBitmap = new BinaryBitmap(new HybridBinarizer(
+                    new BufferedImageLuminanceSource(
+                            ImageIO.read(new FileInputStream(filePath)))));
+            qrCodeResult = new MultiFormatReader().decode(binaryBitmap,
+                    hintMap);
+        } catch (UnsupportedEncodingException ex) {
+            ex.printStackTrace();
+        } catch (NotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return qrCodeResult.getText();
+    }
+
+    public void qrCode(TenantAccount account) {
+        String qrCodeData = "Hello";
+        String filePath = "S:\\NEU\\Assignments\\AED\\AED_LAB_DEMO\\aed_final_project\\AEDFinalProject\\QRCode\\" + account.getUsername() + "-QR-Code.jpg";
+        String charset = "UTF-8"; // or "ISO-8859-1"
+        int qrCodeWidth = 200;
+        int qrCodeHeight = 200;
+        Map hintMap = new HashMap();
+        hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
+
+        generateQRCode(qrCodeData, filePath, charset, hintMap, qrCodeWidth, qrCodeHeight);
+
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jLabel1 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        cityText = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        streetNameTxt = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        noOfRoomsTxt = new javax.swing.JTextField();
+        parkingCheckBox = new javax.swing.JCheckBox();
+        searchBttn = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        apartmentsTable = new javax.swing.JTable();
+        viewBttn = new javax.swing.JButton();
+        bookBttn = new javax.swing.JButton();
+        backBttn = new javax.swing.JButton();
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Select Apartment");
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Search Criteria", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 14))); // NOI18N
+
+        jLabel2.setText("City:");
+
+        cityText.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cityTextActionPerformed(evt);
+            }
+        });
+        cityText.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                cityTextKeyTyped(evt);
+            }
+        });
+
+        jLabel3.setText("Street Name:");
+
+        streetNameTxt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                streetNameTxtActionPerformed(evt);
+            }
+        });
+        streetNameTxt.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                streetNameTxtKeyTyped(evt);
+            }
+        });
+
+        jLabel4.setText("No of Rooms:");
+
+        noOfRoomsTxt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                noOfRoomsTxtActionPerformed(evt);
+            }
+        });
+        noOfRoomsTxt.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                noOfRoomsTxtKeyTyped(evt);
+            }
+        });
+
+        parkingCheckBox.setText("Parking Required");
+
+        searchBttn.setBackground(new java.awt.Color(153, 51, 0));
+        searchBttn.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        searchBttn.setForeground(new java.awt.Color(255, 255, 255));
+        searchBttn.setText("Search");
+        searchBttn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchBttnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(cityText, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(streetNameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(noOfRoomsTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(parkingCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(searchBttn, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(124, 124, 124))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(cityText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3)
+                    .addComponent(streetNameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4)
+                    .addComponent(noOfRoomsTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(parkingCheckBox)
+                    .addComponent(searchBttn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(42, Short.MAX_VALUE))
+        );
+
+        apartmentsTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "City", "Zip Code", "Street Name", "Building No", "Room No", "No Of Rooms", "Parking Available"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(apartmentsTable);
+        if (apartmentsTable.getColumnModel().getColumnCount() > 0) {
+            apartmentsTable.getColumnModel().getColumn(0).setResizable(false);
+            apartmentsTable.getColumnModel().getColumn(1).setResizable(false);
+            apartmentsTable.getColumnModel().getColumn(2).setResizable(false);
+            apartmentsTable.getColumnModel().getColumn(3).setResizable(false);
+            apartmentsTable.getColumnModel().getColumn(4).setResizable(false);
+            apartmentsTable.getColumnModel().getColumn(5).setResizable(false);
+            apartmentsTable.getColumnModel().getColumn(6).setResizable(false);
+        }
+
+        viewBttn.setBackground(new java.awt.Color(153, 51, 0));
+        viewBttn.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        viewBttn.setForeground(new java.awt.Color(255, 255, 255));
+        viewBttn.setText("View Apartment");
+        viewBttn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewBttnActionPerformed(evt);
+            }
+        });
+
+        bookBttn.setBackground(new java.awt.Color(153, 51, 0));
+        bookBttn.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        bookBttn.setForeground(new java.awt.Color(255, 255, 255));
+        bookBttn.setText("Book");
+        bookBttn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bookBttnActionPerformed(evt);
+            }
+        });
+
+        backBttn.setBackground(new java.awt.Color(153, 51, 0));
+        backBttn.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        backBttn.setForeground(new java.awt.Color(255, 255, 255));
+        backBttn.setText("<< Back");
+        backBttn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backBttnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(backBttn, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(viewBttn, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(bookBttn, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 866, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(backBttn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(bookBttn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(viewBttn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(50, Short.MAX_VALUE))
+        );
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void searchBttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBttnActionPerformed
+        // TODO add your handling code here:
+        String preferredCity = cityText.getText();
+        String streetName = streetNameTxt.getText();
+        String noOfRooms = noOfRoomsTxt.getText();
+
+        boolean parkingRequired = parkingCheckBox.isSelected();
+        int pic = JOptionPane.ERROR_MESSAGE;
+
+        if (preferredCity.equalsIgnoreCase("") && streetName.equalsIgnoreCase("") && noOfRooms.equalsIgnoreCase("")) {
+            JOptionPane.showMessageDialog(null, "Please Fill one of the Search Criteria", "", pic);
+        } else {
+            searchResults.clear();
+            for (Network network : ecosystem.getNetworkList()) {
+                Map<String, List<Area>> freeSpaceAvailable = network.getFreeSpaceAvailable();
+                for (String city : freeSpaceAvailable.keySet()) {
+                    List<Area> aList = new ArrayList<>();
+                    for (Area area : freeSpaceAvailable.get(city)) {
+                        aList.add(area.clone());
+                    }
+                    searchResults.put(city, aList);
+                }
+            }
+            searchCity();
+            searchStreet();
+            searchRooms();
+            displayResults();
+        }
+    }//GEN-LAST:event_searchBttnActionPerformed
+
+    private void viewBttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewBttnActionPerformed
+        // TODO add your handling code here:
+        int selectedRow = apartmentsTable.getSelectedRow();
+        int pic = JOptionPane.ERROR_MESSAGE;
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(null, "Please Select an Apartment to View", "", pic);
+        } else {
+            Flat flat = (Flat) apartmentsTable.getValueAt(selectedRow, 4);
+            String city = apartmentsTable.getValueAt(selectedRow, 0).toString();
+            String zipCode = apartmentsTable.getValueAt(selectedRow, 1).toString();
+            String streetName = apartmentsTable.getValueAt(selectedRow, 2).toString();
+            String buildingNo = apartmentsTable.getValueAt(selectedRow, 3).toString();
+
+            ViewApartmentJPanel viewApartmentJPanel = new ViewApartmentJPanel(userProcessContainer, flat, city, zipCode, streetName, buildingNo);
+            userProcessContainer.add("viewEmployeeJpanel", viewApartmentJPanel);
+            CardLayout layout = (CardLayout) userProcessContainer.getLayout();
+            layout.next(userProcessContainer);
+        }
+    }//GEN-LAST:event_viewBttnActionPerformed
+
+    private void backBttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backBttnActionPerformed
+        // TODO add your handling code here:
+        userProcessContainer.remove(this);
+        CardLayout layout = (CardLayout) userProcessContainer.getLayout();
+        layout.previous(userProcessContainer);
+    }//GEN-LAST:event_backBttnActionPerformed
+
+    private void bookBttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bookBttnActionPerformed
+        // TODO add your handling code here:
+        int selectedRow = apartmentsTable.getSelectedRow();
+        int pic = JOptionPane.ERROR_MESSAGE;
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(null, "Please Select an Apartment to Book", "", pic);
+        } else {
+            Address address = new Address();
+            Flat flat = (Flat) apartmentsTable.getValueAt(selectedRow, 4);
+            String city = apartmentsTable.getValueAt(selectedRow, 0).toString();
+            String zipCode = apartmentsTable.getValueAt(selectedRow, 1).toString();
+            String streetName = apartmentsTable.getValueAt(selectedRow, 2).toString();
+            String buildingNo = apartmentsTable.getValueAt(selectedRow, 3).toString();
+            address.setApartmentId(Integer.parseInt(flat.getRoomNo()));
+            Organization org = null;
+            flat.setIsBooked(true);
+            FacilitiesWorkRequest facRequest = new FacilitiesWorkRequest();
+            address.setStreet(streetName);
+            address.setCity(city);
+            address.setZipCode(zipCode);
+            address.setBuildingId(Integer.parseInt(buildingNo));
+            account.getTenant().setTempAddress(address);
+
+            facRequest.setSender(account);
+            facRequest.setStatus("Sent");
+            facRequest.setTenantAccount(account);
+            for (Network network : ecosystem.getNetworkList()) {
+                for (Enterprise enterprise : network.getEnterpriseDirectory().getEnterpriseDirectory()) {
+                    for (Organization organization : enterprise.getOrganizationDirectory().getOrganizationDirectory()) {
+                        if (organization instanceof FacilitiesOrganization) {
+                            org = organization;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (org != null) {
+                org.getWorkQueue().getWorkQueue().add(facRequest);
+                JOptionPane.showMessageDialog(null, "Congratulations!!! Apartment Booked Successfully");
+                bookBttn.setEnabled(false);
+                checkClosure();
+
+            }
+
+        }
+    }//GEN-LAST:event_bookBttnActionPerformed
+
+    private void cityTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cityTextActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cityTextActionPerformed
+
+    private void cityTextKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cityTextKeyTyped
+        // TODO add your handling code here:
+        char ch = evt.getKeyChar();
+        if(!(Character.isAlphabetic(ch)) || (ch == KeyEvent.VK_BACK_SPACE) || (ch == KeyEvent.VK_DELETE))
+        {
+            evt.consume();
+            if(Character.isDigit(ch) || Character.isSpaceChar(ch))
+            JOptionPane.showMessageDialog(null,"Enter alphabetical values only.");
+        }
+    }//GEN-LAST:event_cityTextKeyTyped
+
+    private void streetNameTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_streetNameTxtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_streetNameTxtActionPerformed
+
+    private void streetNameTxtKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_streetNameTxtKeyTyped
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_streetNameTxtKeyTyped
+
+    private void noOfRoomsTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_noOfRoomsTxtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_noOfRoomsTxtActionPerformed
+
+    private void noOfRoomsTxtKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_noOfRoomsTxtKeyTyped
+        // TODO add your handling code here:
+        char ch = evt.getKeyChar();
+        if(!(Character.isDigit(ch)) || (ch == KeyEvent.VK_BACK_SPACE) || (ch == KeyEvent.VK_DELETE))
+        {
+            evt.consume();
+            if(Character.isAlphabetic(ch) || Character.isSpaceChar(ch))
+            JOptionPane.showMessageDialog(null,"Enter numerical values only.");
+        }
+    }//GEN-LAST:event_noOfRoomsTxtKeyTyped
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTable apartmentsTable;
+    private javax.swing.JButton backBttn;
+    private javax.swing.JButton bookBttn;
+    private javax.swing.JTextField cityText;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField noOfRoomsTxt;
+    private javax.swing.JCheckBox parkingCheckBox;
+    private javax.swing.JButton searchBttn;
+    private javax.swing.JTextField streetNameTxt;
+    private javax.swing.JButton viewBttn;
+    // End of variables declaration//GEN-END:variables
+
+    private void searchCity() {
+
+        if (!cityText.getText().equalsIgnoreCase("")) {
+            String city = cityText.getText().toLowerCase();
+            if (!searchResults.containsKey(city)) {
+                searchResults.remove(city);
+            }
+        }
+    }
+
+    private void searchStreet() {
+        if (!streetNameTxt.getText().equalsIgnoreCase("")) {
+            for (String city : searchResults.keySet()) {
+                for (Area area : searchResults.get(city)) {
+                    List<Street> sList = new ArrayList<>();
+                    String streetName = streetNameTxt.getText().toLowerCase();
+                    for (Street street : area.getStreetList()) {
+                        if (!street.getStreetName().equalsIgnoreCase(streetName)) {
+                            sList.add(street);
+                        }
+                    }
+                    area.getStreetList().removeAll(sList);
+                }
+            }
+        }
+    }
+
+    private void searchRooms() {
+        if (!noOfRoomsTxt.getText().equalsIgnoreCase("") && noOfRoomsTxt.getText().matches("^[0-9]+$")) {
+            int rooms = Integer.parseInt(noOfRoomsTxt.getText());
+            for (String city : searchResults.keySet()) {
+                for (Area area : searchResults.get(city)) {
+                    for (Street street : area.getStreetList()) {
+                        searchParking(street.getBuildingList());
+                        for (Building building : street.getBuildingList()) {
+                            List<Flat> fList = new ArrayList<>();
+                            for (Flat flat : building.getFlats()) {
+                                if (flat.getNoOfRooms() != rooms) {
+                                    fList.add(flat);
+                                }
+                            }
+                            building.getFlats().removeAll(fList);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void displayResults() {
+        DefaultTableModel dtm = (DefaultTableModel) apartmentsTable.getModel();
+        dtm.setRowCount(0);
+        Object row[] = new Object[7];
+        for (String city : searchResults.keySet()) {
+            for (Area area : searchResults.get(city)) {
+                for (Street street : area.getStreetList()) {
+                    for (Building building : street.getBuildingList()) {
+                        for (Flat flat : building.getFlats()) {
+                            row[0] = city;
+                            row[1] = area.getZipcode();
+                            row[2] = street.getStreetName();
+                            row[3] = building.getBuildingId();
+                            row[4] = flat;
+                            row[5] = flat.getNoOfRooms();
+                            row[6] = building.isParkingAvailable() ? "Y" : "N";
+                            dtm.addRow(row);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void searchParking(ArrayList<Building> buildingList) {
+        for (Building building : buildingList) {
+            if (parkingCheckBox.isSelected() && !building.isParkingAvailable()) {
+                buildingList.remove(building);
+            }
+        }
+    }
+
+    private void checkClosure() {
+        for(Account account : event.getAccountDirectory().getAccountDirectory()) {
+            TenantAccount ta = (TenantAccount)account;
+            if(!ta.isFeedBackSubmitted())
+                return;
+        }
+        event.getProject().setProjectStatus(Project.ProjectStatus.INPROGRESS);
+    }
+}
